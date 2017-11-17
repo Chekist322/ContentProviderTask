@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">ContentProviderDataBase</string>
+    <string-array name="choice">
+        <item>foxes</item>
+        <item>badgers</item>
+    </string-array>
+</resources>
