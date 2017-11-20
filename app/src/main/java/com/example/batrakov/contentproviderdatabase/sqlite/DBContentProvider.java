@@ -81,7 +81,7 @@ public class DBContentProvider extends ContentProvider {
                 }
                 break;
         }
-        mDatabase = mDBHelper.getWritableDatabase();
+        mDatabase = mDBHelper.getReadableDatabase();
         Cursor cursor = mDatabase.query(tableName, projection, selection,
                 selectionArgs, null, null, sortOrder);
         if (getContext() != null) {
@@ -99,13 +99,21 @@ public class DBContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-
+        mDatabase = mDBHelper.getWritableDatabase();
+        switch (URI_MATCHER.match(uri)) {
+            case DBContract.URI_FIRST_TABLE_ALL:
+                mDatabase.insert(DBContract.Entry.FIRST_TABLE_NAME, null, values);
+                break;
+            case DBContract.URI_SECOND_TABLE_ALL:
+                mDatabase.insert(DBContract.Entry.SECOND_TABLE_NAME, null, values);
+                break;
+        }
         return null;
     }
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        mDBHelper.deleteTables(getContext());
+        mDBHelper.deleteTables();
         return 0;
     }
 

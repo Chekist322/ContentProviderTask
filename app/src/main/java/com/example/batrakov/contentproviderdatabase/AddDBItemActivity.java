@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.example.batrakov.contentproviderdatabase.sqlite.DBContract;
+import com.example.batrakov.contentproviderdatabase.sqlite.DBHelper;
 
 public class AddDBItemActivity extends AppCompatActivity {
 
@@ -22,10 +23,14 @@ public class AddDBItemActivity extends AppCompatActivity {
 
     String mTableChoice = "foxes";
 
+    DBHelper mHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_item);
+
+        mHelper = new DBHelper(this);
 
         mSpinner = findViewById(R.id.table_choice);
         mNameEditText = findViewById(R.id.name_edit_text);
