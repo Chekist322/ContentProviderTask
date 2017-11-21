@@ -1,7 +1,6 @@
 package com.example.batrakov.contentproviderdatabase.sqlite;
 
 import android.content.ContentProvider;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -11,6 +10,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+/**
+ * Content provider for accessing Database safely and allow to work with
+ * database by remote queries from another apps.
+ */
 public class DBContentProvider extends ContentProvider {
 
     private static final UriMatcher URI_MATCHER;
@@ -31,8 +34,8 @@ public class DBContentProvider extends ContentProvider {
                 + "/#", DBContract.URI_SECOND_TABLE_SINGLE_ID);
     }
 
-    DBHelper mDBHelper;
-    SQLiteDatabase mDatabase;
+    private DBHelper mDBHelper;
+    private SQLiteDatabase mDatabase;
 
     @Override
     public boolean onCreate() {
@@ -42,48 +45,50 @@ public class DBContentProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection,
-                        @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+    public Cursor query(@NonNull Uri aUri, @Nullable String[] aProjection, @Nullable String aSelection,
+                        @Nullable String[] aSelectionArgs, @Nullable String aSortOrder) {
         String tableName = null;
-        String id = uri.getLastPathSegment();
+        String id = aUri.getLastPathSegment();
         Uri contentUri = null;
-        switch (URI_MATCHER.match(uri)) {
+        switch (URI_MATCHER.match(aUri)) {
             case DBContract.URI_FIRST_TABLE_ALL:
                 tableName = DBContract.Entry.FIRST_TABLE_NAME;
                 contentUri = DBContract.FIRST_TABLE_CONTENT_URI;
-                if (TextUtils.isEmpty(sortOrder)) {
-                    sortOrder = DBContract.Entry._ID + " ASC";
+                if (TextUtils.isEmpty(aSortOrder)) {
+                    aSortOrder = DBContract.Entry._ID + " ASC";
                 }
                 break;
             case DBContract.URI_SECOND_TABLE_ALL:
                 contentUri = DBContract.SECOND_TABLE_CONTENT_URI;
                 tableName = DBContract.Entry.SECOND_TABLE_NAME;
-                if (TextUtils.isEmpty(sortOrder)) {
-                    sortOrder = DBContract.Entry._ID + " ASC";
+                if (TextUtils.isEmpty(aSortOrder)) {
+                    aSortOrder = DBContract.Entry._ID + " ASC";
                 }
                 break;
             case DBContract.URI_FIRST_TABLE_SINGLE_ID:
                 contentUri = DBContract.FIRST_TABLE_CONTENT_URI;
                 tableName = DBContract.Entry.FIRST_TABLE_NAME;
-                if (TextUtils.isEmpty(selection)) {
-                    selection = DBContract.Entry._ID + " = " + id;
+                if (TextUtils.isEmpty(aSelection)) {
+                    aSelection = DBContract.Entry._ID + " = " + id;
                 } else {
-                    selection = selection + " AND " + DBContract.Entry._ID + " = " + id;
+                    aSelection = aSelection + " AND " + DBContract.Entry._ID + " = " + id;
                 }
                 break;
             case DBContract.URI_SECOND_TABLE_SINGLE_ID:
                 contentUri = DBContract.SECOND_TABLE_CONTENT_URI;
                 tableName = DBContract.Entry.SECOND_TABLE_NAME;
-                if (TextUtils.isEmpty(selection)) {
-                    selection = DBContract.Entry._ID + " = " + id;
+                if (TextUtils.isEmpty(aSelection)) {
+                    aSelection = DBContract.Entry._ID + " = " + id;
                 } else {
-                    selection = selection + " AND " + DBContract.Entry._ID + " = " + id;
+                    aSelection = aSelection + " AND " + DBContract.Entry._ID + " = " + id;
                 }
                 break;
+            default:
+                return null;
         }
         mDatabase = mDBHelper.getReadableDatabase();
-        Cursor cursor = mDatabase.query(tableName, projection, selection,
-                selectionArgs, null, null, sortOrder);
+        Cursor cursor = mDatabase.query(tableName, aProjection, aSelection,
+                aSelectionArgs, null, null, aSortOrder);
         if (getContext() != null) {
             cursor.setNotificationUri(getContext().getContentResolver(), contentUri);
         }
@@ -92,33 +97,36 @@ public class DBContentProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public String getType(@NonNull Uri uri) {
+    public String getType(@NonNull Uri aUri) {
         return null;
     }
 
     @Nullable
     @Override
-    public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
+    public Uri insert(@NonNull Uri aUri, @Nullable ContentValues aValues) {
         mDatabase = mDBHelper.getWritableDatabase();
-        switch (URI_MATCHER.match(uri)) {
+        switch (URI_MATCHER.match(aUri)) {
             case DBContract.URI_FIRST_TABLE_ALL:
-                mDatabase.insert(DBContract.Entry.FIRST_TABLE_NAME, null, values);
+                mDatabase.insert(DBContract.Entry.FIRST_TABLE_NAME, null, aValues);
                 break;
             case DBContract.URI_SECOND_TABLE_ALL:
-                mDatabase.insert(DBContract.Entry.SECOND_TABLE_NAME, null, values);
+                mDatabase.insert(DBContract.Entry.SECOND_TABLE_NAME, null, aValues);
                 break;
+            default:
+                return null;
         }
         return null;
     }
 
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+    public int delete(@NonNull Uri aUri, @Nullable String aSelection, @Nullable String[] aSelectionArgs) {
         mDBHelper.deleteTables();
         return 0;
     }
 
     @Override
-    public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
+    public int update(@NonNull Uri aUri, @Nullable ContentValues aValues,
+                      @Nullable String aSelection, @Nullable String[] aSelectionArgs) {
         return 0;
     }
 }
