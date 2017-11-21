@@ -18,25 +18,28 @@ public class DBHelper extends SQLiteOpenHelper {
      *
      * @param aContext aContext from Activity for super method.
      */
-    public DBHelper(Context aContext) {
+    DBHelper(Context aContext) {
         super(aContext, DBContract.DATABASE_NAME, null, DBContract.DATABASE_VERSION);
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        try {
-            db.execSQL(DBContract.FIRST_TABLE_CREATE_ENTRIES);
-            db.execSQL(DBContract.SECOND_TABLE_CREATE_ENTRIES);
-        } catch (SQLiteException aE) {
-            Log.d(TAG, "DBHelper: tables already exist");
-        }
     }
 
     @Override
     public void onCreate(SQLiteDatabase aDatabase) {
+        try {
+            aDatabase.execSQL(DBContract.FIRST_TABLE_CREATE_ENTRIES);
+            aDatabase.execSQL(DBContract.SECOND_TABLE_CREATE_ENTRIES);
+        } catch (SQLiteException aE) {
+            aE.printStackTrace();
+        }
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase aDatabase, int aOldVersion, int aNewVersion) {
+        System.out.println(aDatabase);
+    }
 
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        super.onDowngrade(db, oldVersion, newVersion);
     }
 
     /**

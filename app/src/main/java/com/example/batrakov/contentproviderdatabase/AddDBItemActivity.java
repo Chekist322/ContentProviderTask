@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.batrakov.contentproviderdatabase.sqlite.DBContract;
 
@@ -47,7 +48,14 @@ public class AddDBItemActivity extends AppCompatActivity {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View aView) {
-                addRowToDatabase();
+                String name = mNameEditText.getText().toString();
+                String age = mAgeEditText.getText().toString();
+                if (!name.equals("") && !age.equals("")) {
+                    addRowToDatabase(name, age);
+                } else {
+                    Toast.makeText(getBaseContext(), "Don't left fields empty", Toast.LENGTH_SHORT).show();
+                }
+                mNameEditText.requestFocus();
             }
         });
 
@@ -62,25 +70,27 @@ public class AddDBItemActivity extends AppCompatActivity {
     /**
      * Add new item to chosen table from Database.
      */
-    private void addRowToDatabase() {
-        String name = String.valueOf(mNameEditText.getText());
-        String age = String.valueOf(mAgeEditText.getText());
+    private void addRowToDatabase(String aName, String aAge) {
 
         ContentValues values = new ContentValues();
-        values.put(DBContract.Entry.COLUMN_NAME_NAME, name);
-        values.put(DBContract.Entry.COLUMN_NAME_AGE, age);
+        values.put(DBContract.Entry.COLUMN_NAME_NAME, aName);
+        values.put(DBContract.Entry.COLUMN_NAME_AGE, aAge);
 
         switch (mTableChoice) {
             case "foxes":
-                System.out.println("adding fox");
                 getContentResolver().insert(DBContract.FIRST_TABLE_CONTENT_URI, values);
+                Toast.makeText(this, "+1 foxy", Toast.LENGTH_SHORT).show();
                 break;
             case "badgers":
                 getContentResolver().insert(DBContract.SECOND_TABLE_CONTENT_URI, values);
+                Toast.makeText(this, "+1 badger", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
         }
+
+        mAgeEditText.setText("");
+        mNameEditText.setText("");
     }
 
     /**
