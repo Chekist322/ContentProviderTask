@@ -115,12 +115,18 @@ public class DBContentProvider extends ContentProvider {
             default:
                 return null;
         }
+        if (getContext() != null) {
+            getContext().getContentResolver().notifyChange(aUri, null);
+        }
         return null;
     }
 
     @Override
     public int delete(@NonNull Uri aUri, @Nullable String aSelection, @Nullable String[] aSelectionArgs) {
         mDBHelper.deleteTables();
+        if (getContext() != null) {
+            getContext().getContentResolver().notifyChange(aUri, null);
+        }
         return 0;
     }
 
