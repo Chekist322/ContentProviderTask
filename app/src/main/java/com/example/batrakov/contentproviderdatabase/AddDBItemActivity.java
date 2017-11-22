@@ -1,5 +1,7 @@
 package com.example.batrakov.contentproviderdatabase;
 
+import android.content.AsyncQueryHandler;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +15,8 @@ import android.widget.Toast;
 
 import com.example.batrakov.contentproviderdatabase.sqlite.DBContract;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Activity allow to add new elements to Database and clear tables.
  */
@@ -21,6 +25,10 @@ public class AddDBItemActivity extends AppCompatActivity {
     private static final String FOXES = "foxes";
     private static final String DEFAULT_COLOR = "red";
 
+    private static final int INSERT_TOKEN_FOX = 0;
+    private static final int INSERT_TOKEN_BADGER = 1;
+
+    private QueryHandler mQueryHandler;
     private EditText mNameEditText;
     private EditText mAgeEditText;
     private Spinner mSpinnerColor;
@@ -30,6 +38,8 @@ public class AddDBItemActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle aSavedInstanceState) {
         super.onCreate(aSavedInstanceState);
+
+        mQueryHandler = new QueryHandler(getContentResolver(), this);
 
         setContentView(R.layout.add_item);
 
@@ -77,7 +87,7 @@ public class AddDBItemActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(getBaseContext(), "Don't left fields empty", Toast.LENGTH_SHORT).show();
                 }
-                mNameEditText.requestFocus();
+
             }
         });
 
@@ -93,7 +103,6 @@ public class AddDBItemActivity extends AppCompatActivity {
      * Add new item to chosen table from Database.
      */
     private void addRowToDatabase(String aName, String aAge) {
-
         ContentValues values = new ContentValues();
         values.put(DBContract.Entry.COLUMN_NAME_NAME, aName);
         values.put(DBContract.Entry.COLUMN_NAME_AGE, aAge);
@@ -101,19 +110,16 @@ public class AddDBItemActivity extends AppCompatActivity {
         switch (mTypeChoice) {
             case "foxes":
                 values.put(DBContract.Entry.COLUMN_NAME_COLOR, mColorChoice);
-                getContentResolver().insert(DBContract.FIRST_TABLE_CONTENT_URI, values);
-                Toast.makeText(this, "+1 foxy", Toast.LENGTH_SHORT).show();
+                mQueryHandler.startInsert(INSERT_TOKEN_FOX, null, DBContract.FIRST_TABLE_CONTENT_URI, values);
                 break;
             case "badgers":
-                getContentResolver().insert(DBContract.SECOND_TABLE_CONTENT_URI, values);
-                Toast.makeText(this, "+1 badger", Toast.LENGTH_SHORT).show();
+                mQueryHandler.startInsert(INSERT_TOKEN_BADGER, null, DBContract.SECOND_TABLE_CONTENT_URI, values);
                 break;
             default:
                 break;
         }
 
-        mAgeEditText.setText("");
-        mNameEditText.setText("");
+
     }
 
     /**
@@ -122,5 +128,44 @@ public class AddDBItemActivity extends AppCompatActivity {
     private void clearTables() {
         getContentResolver().delete(Uri.parse("content://"
                 + DBContract.CONTENT_AUTHORITY + "/"), null, null);
+    }
+
+    /**
+     * Handler for executing long write operation in another thread.
+     */
+    private static class QueryHandler extends AsyncQueryHandler {
+
+        private WeakReference<AddDBItemActivity> mReference;
+
+        /**
+         * Constructor.
+         *
+         * @param aContentResolver context ContentResolver.
+         * @param aActivity current context Activity.
+         */
+        QueryHandler(ContentResolver aContentResolver, AddDBItemActivity aActivity) {
+            super(aContentResolver);
+            mReference = new WeakReference<>(aActivity);
+        }
+
+        @Override
+        protected void onInsertComplete(int token, Object cookie, Uri uri) {
+            AddDBItemActivity activity = mReference.get();
+            if (activity != null) {
+                switch (token) {
+                    case INSERT_TOKEN_FOX:
+                        Toast.makeText(activity, "+1 foxy", Toast.LENGTH_SHORT).show();
+                        break;
+                    case INSERT_TOKEN_BADGER:
+                        Toast.makeText(activity, "+1 badger", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        break;
+                }
+                activity.mAgeEditText.setText("");
+                activity.mNameEditText.setText("");
+                activity.mNameEditText.requestFocus();
+            }
+        }
     }
 }
