@@ -15,7 +15,7 @@
         android:roundIcon="@raw/icondatabase"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AddDBItemActivity">
+        <activity android:name=".AddDBItemActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
