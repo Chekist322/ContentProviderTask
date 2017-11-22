@@ -1,8 +1,14 @@
 <resources>
     <string name="app_name">ContentProviderDataBase</string>
     <string name="permission_description">allow to access content provider in one another app</string>
-    <string-array name="choice">
+    <string-array name="type">
         <item>foxes</item>
         <item>badgers</item>
+    </string-array>
+    <string-array name="color">
+        <item>red</item>
+        <item>grey</item>
+        <item>white</item>
+        <item>black</item>
     </string-array>
 </resources>

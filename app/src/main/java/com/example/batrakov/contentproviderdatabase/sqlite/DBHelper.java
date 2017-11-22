@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 /**
  * Database helper optimize and rule work with SQLiteDatabase.
@@ -24,6 +23,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase aDatabase) {
+        System.out.println(aDatabase.isReadOnly());
         try {
             aDatabase.execSQL(DBContract.FIRST_TABLE_CREATE_ENTRIES);
             aDatabase.execSQL(DBContract.SECOND_TABLE_CREATE_ENTRIES);
@@ -34,18 +34,16 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase aDatabase, int aOldVersion, int aNewVersion) {
-        System.out.println(aDatabase);
-    }
-
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        super.onDowngrade(db, oldVersion, newVersion);
+        if (aOldVersion == 1 && aNewVersion == 2) {
+            aDatabase.execSQL("ALTER TABLE " + DBContract.Entry.FIRST_TABLE_NAME
+                    + " ADD COLUMN " + DBContract.Entry.COLUMN_NAME_COLOR + " TEXT DEFAULT " + "'red'");
+        }
     }
 
     /**
      * Delete first table from Database.
      */
-    private void deleteFirstTable() {
+    private void clearFirstTable() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(DBContract.Entry.FIRST_TABLE_NAME, null, null);
     }
@@ -53,16 +51,16 @@ public class DBHelper extends SQLiteOpenHelper {
     /**
      * Delete second table from Database.
      */
-    private void deleteSecondTable() {
+    private void clearSecondTable() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(DBContract.Entry.SECOND_TABLE_NAME, null, null);
     }
 
     /**
-     * Delete both tables from Database.
+     * Clear both tables from Database.
      */
-    void deleteTables() {
-        deleteFirstTable();
-        deleteSecondTable();
+    void clearTables() {
+        clearFirstTable();
+        clearSecondTable();
     }
 }

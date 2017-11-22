@@ -47,9 +47,9 @@ public class DBContentProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri aUri, @Nullable String[] aProjection, @Nullable String aSelection,
                         @Nullable String[] aSelectionArgs, @Nullable String aSortOrder) {
-        String tableName = null;
+        String tableName;
         String id = aUri.getLastPathSegment();
-        Uri contentUri = null;
+        Uri contentUri;
         switch (URI_MATCHER.match(aUri)) {
             case DBContract.URI_FIRST_TABLE_ALL:
                 tableName = DBContract.Entry.FIRST_TABLE_NAME;
@@ -123,7 +123,7 @@ public class DBContentProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri aUri, @Nullable String aSelection, @Nullable String[] aSelectionArgs) {
-        mDBHelper.deleteTables();
+        mDBHelper.clearTables();
         if (getContext() != null) {
             getContext().getContentResolver().notifyChange(aUri, null);
         }

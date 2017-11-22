@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.example.batrakov.contentproviderdatabase">
 
-    <permission android:name="com.example.batrakov.contentproviderdatabase.permission"
+    <permission android:name="com.example.batrakov.contentproviderdatabase.permission.READ_PROVIDER"
         android:label="access to content provider"
         android:protectionLevel="normal"
         android:description="@string/permission_description">
@@ -27,7 +27,7 @@
             android:authorities="com.example.batrakov.contentproviderdatabase.authority"
             android:name=".sqlite.DBContentProvider"
             android:exported="true"
-            android:permission="com.example.batrakov.contentproviderdatabase.permission"/>
+            android:readPermission="com.example.batrakov.contentproviderdatabase.permission.READ_PROVIDER"/>
 
     </application>
 

@@ -29,7 +29,7 @@ public final class DBContract {
     private static final String TYPE_INTEGER = " INTEGER";
 
     static final String DATABASE_NAME = "db";
-    static final int DATABASE_VERSION = 1;
+    static final int DATABASE_VERSION = 2;
 
     static final String FIRST_TABLE_CREATE_ENTRIES =
             "CREATE TABLE " + Entry.FIRST_TABLE_NAME + " ("
@@ -64,6 +64,11 @@ public final class DBContract {
          * Age column name.
          */
         public static final String COLUMN_NAME_AGE = "age";
+
+        /**
+         * Color column name.
+         */
+        public static final String COLUMN_NAME_COLOR = "color";
 
         static final String FIRST_TABLE_NAME = "foxes";
         static final String SECOND_TABLE_NAME = "badgers";

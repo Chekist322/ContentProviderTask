@@ -18,30 +18,52 @@ import com.example.batrakov.contentproviderdatabase.sqlite.DBContract;
  */
 public class AddDBItemActivity extends AppCompatActivity {
 
+    private static final String FOXES = "foxes";
+    private static final String DEFAULT_COLOR = "red";
+
     private EditText mNameEditText;
     private EditText mAgeEditText;
-    private String mTableChoice = "foxes";
+    private Spinner mSpinnerColor;
+    private String mTypeChoice = FOXES;
+    private String mColorChoice = DEFAULT_COLOR;
 
     @Override
     protected void onCreate(Bundle aSavedInstanceState) {
         super.onCreate(aSavedInstanceState);
+
         setContentView(R.layout.add_item);
 
-        Spinner spinner = findViewById(R.id.table_choice);
+        mSpinnerColor = findViewById(R.id.color_choice);
         mNameEditText = findViewById(R.id.name_edit_text);
         mAgeEditText = findViewById(R.id.age_edit_text);
+        Spinner spinnerType = findViewById(R.id.type_choice);
         Button addButton = findViewById(R.id.add_button);
         Button clearDatabaseButton = findViewById(R.id.clear_button);
 
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spinnerType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> aParent, View aView, int aPosition, long aId) {
-                mTableChoice = getResources().getStringArray(R.array.choice)[aPosition];
+                mTypeChoice = getResources().getStringArray(R.array.type)[aPosition];
+                if (mTypeChoice.equals(FOXES)) {
+                    mSpinnerColor.setVisibility(View.VISIBLE);
+                } else {
+                    mSpinnerColor.setVisibility(View.GONE);
+                }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> aParent) {
-                mTableChoice = "foxes";
+            }
+        });
+
+        mSpinnerColor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> aParent, View aView, int aPosition, long aId) {
+                mColorChoice = getResources().getStringArray(R.array.color)[aPosition];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> aParent) {
             }
         });
 
@@ -76,8 +98,9 @@ public class AddDBItemActivity extends AppCompatActivity {
         values.put(DBContract.Entry.COLUMN_NAME_NAME, aName);
         values.put(DBContract.Entry.COLUMN_NAME_AGE, aAge);
 
-        switch (mTableChoice) {
+        switch (mTypeChoice) {
             case "foxes":
+                values.put(DBContract.Entry.COLUMN_NAME_COLOR, mColorChoice);
                 getContentResolver().insert(DBContract.FIRST_TABLE_CONTENT_URI, values);
                 Toast.makeText(this, "+1 foxy", Toast.LENGTH_SHORT).show();
                 break;

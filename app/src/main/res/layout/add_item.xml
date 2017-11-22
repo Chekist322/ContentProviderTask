@@ -8,16 +8,31 @@
     tools:context="com.example.batrakov.contentproviderdatabase.AddDBItemActivity">
 
     <Spinner
-        android:id="@+id/table_choice"
+        android:id="@+id/type_choice"
+        style="@android:style/Widget.Holo.Light.Spinner"
         android:layout_width="250dp"
         android:layout_height="45dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="30dp"
-        android:entries="@array/choice"
+        android:entries="@array/type"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
+
+    <Spinner
+        android:id="@+id/color_choice"
+        style="@android:style/Widget.Holo.Light.Spinner"
+        android:layout_width="250dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:entries="@array/color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/type_choice"/>
 
     <EditText
         android:id="@+id/name_edit_text"
@@ -25,13 +40,13 @@
         android:layout_height="45dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="Name"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/table_choice"/>
+        app:layout_constraintTop_toBottomOf="@+id/color_choice"/>
 
     <EditText
         android:id="@+id/age_edit_text"
@@ -39,7 +54,7 @@
         android:layout_height="45dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="Age"
         android:inputType="number"
@@ -53,7 +68,7 @@
         android:layout_height="45dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="16dp"
         android:text="Add to database"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
