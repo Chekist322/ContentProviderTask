@@ -9,6 +9,12 @@ import android.provider.BaseColumns;
 public final class DBContract {
 
     /**
+     * Blocking constructor.
+     */
+    private DBContract(){
+    }
+
+    /**
      * Content provider authority.
      */
     public static final String CONTENT_AUTHORITY = "com.example.batrakov.contentproviderdatabase.authority";
