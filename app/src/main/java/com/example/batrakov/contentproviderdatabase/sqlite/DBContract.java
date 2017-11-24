@@ -11,7 +11,7 @@ public final class DBContract {
     /**
      * Blocking constructor.
      */
-    private DBContract(){
+    private DBContract() {
     }
 
     /**
@@ -41,7 +41,8 @@ public final class DBContract {
             "CREATE TABLE " + Entry.FIRST_TABLE_NAME + " ("
                     + Entry._ID + " INTEGER PRIMARY KEY,"
                     + Entry.COLUMN_NAME_NAME + TYPE_TEXT + ","
-                    + Entry.COLUMN_NAME_AGE + TYPE_INTEGER + ")";
+                    + Entry.COLUMN_NAME_AGE + TYPE_INTEGER + ","
+                    + Entry.COLUMN_NAME_COLOR + TYPE_TEXT + ")";
 
 
     static final String SECOND_TABLE_CREATE_ENTRIES =

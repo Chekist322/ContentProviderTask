@@ -39,6 +39,10 @@ public class AddDBItemActivity extends AppCompatActivity {
     protected void onCreate(Bundle aSavedInstanceState) {
         super.onCreate(aSavedInstanceState);
 
+        String text = "_id = 556 AND _id = 13;";
+        String text1 = "_id = 556 AND _id = 5";
+        System.out.println(text.matches("(_id = \\d+\\s*(AND)*\\s*)+"));
+
         mQueryHandler = new QueryHandler(getContentResolver(), this);
 
         setContentView(R.layout.add_item);
@@ -101,6 +105,9 @@ public class AddDBItemActivity extends AppCompatActivity {
 
     /**
      * Add new item to chosen table from Database.
+     *
+     * @param aName typed name
+     * @param aAge typed age
      */
     private void addRowToDatabase(String aName, String aAge) {
         ContentValues values = new ContentValues();
@@ -135,7 +142,7 @@ public class AddDBItemActivity extends AppCompatActivity {
      */
     private static class QueryHandler extends AsyncQueryHandler {
 
-        private WeakReference<AddDBItemActivity> mReference;
+        private WeakReference<AddDBItemActivity> mReferenceToActivity;
 
         /**
          * Constructor.
@@ -145,14 +152,14 @@ public class AddDBItemActivity extends AppCompatActivity {
          */
         QueryHandler(ContentResolver aContentResolver, AddDBItemActivity aActivity) {
             super(aContentResolver);
-            mReference = new WeakReference<>(aActivity);
+            mReferenceToActivity = new WeakReference<>(aActivity);
         }
 
         @Override
-        protected void onInsertComplete(int token, Object cookie, Uri uri) {
-            AddDBItemActivity activity = mReference.get();
-            if (activity != null) {
-                switch (token) {
+        protected void onInsertComplete(int aToken, Object aCookie, Uri aUri) {
+            AddDBItemActivity activity = mReferenceToActivity.get();
+            if (aUri != null && activity != null) {
+                switch (aToken) {
                     case INSERT_TOKEN_FOX:
                         Toast.makeText(activity, "+1 foxy", Toast.LENGTH_SHORT).show();
                         break;
@@ -165,6 +172,8 @@ public class AddDBItemActivity extends AppCompatActivity {
                 activity.mAgeEditText.setText("");
                 activity.mNameEditText.setText("");
                 activity.mNameEditText.requestFocus();
+            } else {
+                Toast.makeText(activity, "Something went wrong, insertion failed :(", Toast.LENGTH_SHORT).show();
             }
         }
     }

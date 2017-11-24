@@ -5,10 +5,13 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
+import android.util.Log;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Content provider for accessing Database safely and allow to work with
@@ -47,48 +50,48 @@ public class DBContentProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri aUri, @Nullable String[] aProjection, @Nullable String aSelection,
                         @Nullable String[] aSelectionArgs, @Nullable String aSortOrder) {
+        if (aSelection != null && !aSelection.matches("(_id = \\d+\\s*(AND)*\\s*)+")) {
+            Log.d(TAG, "query: Ow, u little piece of bastard, u wanna rape me?");
+            return null;
+        }
+
         String tableName;
         String id = aUri.getLastPathSegment();
         Uri contentUri;
+
+        Cursor cursor;
         switch (URI_MATCHER.match(aUri)) {
             case DBContract.URI_FIRST_TABLE_ALL:
                 tableName = DBContract.Entry.FIRST_TABLE_NAME;
                 contentUri = DBContract.FIRST_TABLE_CONTENT_URI;
-                if (TextUtils.isEmpty(aSortOrder)) {
-                    aSortOrder = DBContract.Entry._ID + " ASC";
-                }
+
+                mDatabase = mDBHelper.getReadableDatabase();
+                cursor = mDatabase.rawQuery("select * from " + tableName, null);
                 break;
             case DBContract.URI_SECOND_TABLE_ALL:
                 contentUri = DBContract.SECOND_TABLE_CONTENT_URI;
                 tableName = DBContract.Entry.SECOND_TABLE_NAME;
-                if (TextUtils.isEmpty(aSortOrder)) {
-                    aSortOrder = DBContract.Entry._ID + " ASC";
-                }
+
+                mDatabase = mDBHelper.getReadableDatabase();
+                cursor = mDatabase.rawQuery("select * from " + tableName, null);
                 break;
             case DBContract.URI_FIRST_TABLE_SINGLE_ID:
                 contentUri = DBContract.FIRST_TABLE_CONTENT_URI;
                 tableName = DBContract.Entry.FIRST_TABLE_NAME;
-                if (TextUtils.isEmpty(aSelection)) {
-                    aSelection = DBContract.Entry._ID + " = " + id;
-                } else {
-                    aSelection = aSelection + " AND " + DBContract.Entry._ID + " = " + id;
-                }
+
+                mDatabase = mDBHelper.getReadableDatabase();
+                cursor = mDatabase.rawQuery("select * from " + tableName + " where " + "_id = ?", new String[]{id});
                 break;
             case DBContract.URI_SECOND_TABLE_SINGLE_ID:
                 contentUri = DBContract.SECOND_TABLE_CONTENT_URI;
                 tableName = DBContract.Entry.SECOND_TABLE_NAME;
-                if (TextUtils.isEmpty(aSelection)) {
-                    aSelection = DBContract.Entry._ID + " = " + id;
-                } else {
-                    aSelection = aSelection + " AND " + DBContract.Entry._ID + " = " + id;
-                }
+
+                mDatabase = mDBHelper.getReadableDatabase();
+                cursor = mDatabase.rawQuery("select * from " + tableName + " where " + "_id = ?", new String[]{id});
                 break;
             default:
                 return null;
         }
-        mDatabase = mDBHelper.getReadableDatabase();
-        Cursor cursor = mDatabase.query(tableName, aProjection, aSelection,
-                aSelectionArgs, null, null, aSortOrder);
         if (getContext() != null) {
             cursor.setNotificationUri(getContext().getContentResolver(), contentUri);
         }
@@ -107,10 +110,20 @@ public class DBContentProvider extends ContentProvider {
         mDatabase = mDBHelper.getWritableDatabase();
         switch (URI_MATCHER.match(aUri)) {
             case DBContract.URI_FIRST_TABLE_ALL:
-                mDatabase.insert(DBContract.Entry.FIRST_TABLE_NAME, null, aValues);
+                try {
+                    mDatabase.insert(DBContract.Entry.FIRST_TABLE_NAME, null, aValues);
+                } catch (SQLiteException aE) {
+                    aE.printStackTrace();
+                    return null;
+                }
                 break;
             case DBContract.URI_SECOND_TABLE_ALL:
-                mDatabase.insert(DBContract.Entry.SECOND_TABLE_NAME, null, aValues);
+                try {
+                    mDatabase.insert(DBContract.Entry.SECOND_TABLE_NAME, null, aValues);
+                } catch (SQLiteException aE) {
+                    aE.printStackTrace();
+                    return null;
+                }
                 break;
             default:
                 return null;
@@ -118,7 +131,8 @@ public class DBContentProvider extends ContentProvider {
         if (getContext() != null) {
             getContext().getContentResolver().notifyChange(aUri, null);
         }
-        return null;
+
+        return aUri;
     }
 
     @Override
